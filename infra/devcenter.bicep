@@ -41,7 +41,7 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
 }
 
 resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = if (deployVnet) {
-  name: devCenterName
+  name: '${devCenterName}-network-connection'
   location: location
   properties: {
     domainJoinType: 'AzureADJoin'
@@ -52,7 +52,7 @@ resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-pr
 
 resource attachedNetwork 'Microsoft.DevCenter/devcenters/attachednetworks@2024-05-01-preview' = if (deployVnet) {
   parent: devCenter
-  name: 'default'
+  name: 'default-attached-network'
   properties: {
     networkConnectionId: networkConnection.id
   }
