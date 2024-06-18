@@ -3,6 +3,8 @@ param location string
 param vnetResourceGroupName string
 param subnetId string
 
+var deployVnet = true
+
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
   name: devCenterName
   location: location
@@ -17,13 +19,9 @@ resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
       microsoftHostedNetworkEnableStatus: 'Disabled'
     }
   }
-}
 
-resource devCenterDefaultGallery 'Microsoft.DevCenter/devcenters/galleries@2024-05-01-preview' = {
-  parent: devCenter
-  name: 'Default'
-  properties: {
-    galleryResourceId: resourceId('Microsoft.DevCenter/devcenters/galleries', devCenterName, 'Default')
+  resource defaultGallery 'galleries' existing = {
+    name: 'Default'
   }
 }
 
@@ -33,7 +31,7 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   location: location
   properties: {
     imageReference: {
-      id: '${devCenterDefaultGallery.id}/images/microsoftvisualstudio_visualstudioplustools_vs-2022-ent-general-win11-m365-gen2'
+      id: '${devCenter::defaultGallery.id}/images/microsoftvisualstudio_visualstudioplustools_vs-2022-ent-general-win11-m365-gen2'
     }
     sku: {
       name: 'general_i_8c32gb256ssd_v2'
@@ -42,7 +40,7 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
-resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = {  
+resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = if (deployVnet) {  
   name: 'networkConnection'
   location: location
   properties: {

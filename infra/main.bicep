@@ -1,12 +1,12 @@
 param location string = resourceGroup().location
 
 var uniqueness = uniqueString(resourceGroup().id)
-var galleryName = 'gallery-${uniqueness}'
-var vnetName = 'vnet-${uniqueness}'
-var devCenterName = 'devcenter-${uniqueness}'
+var galleryName = 'gallery${uniqueness}'
+var vnetName = 'vnet${uniqueness}'
+var devCenterName = 'devcenter${uniqueness}'
 
 module network 'network.bicep' = {
-  name: 'network'
+  name: '${deployment().name}-network'
   params: {
     location: location
     vnetName: vnetName    
@@ -14,7 +14,7 @@ module network 'network.bicep' = {
 }
 
 module devcenter 'devcenter.bicep' = {
-  name: devCenterName
+  name: '${deployment().name}-devcenter'
   params: {
     devCenterName: devCenterName
     location: location    
@@ -24,7 +24,7 @@ module devcenter 'devcenter.bicep' = {
 }
 
 module gallery 'gallery.bicep' = {
-  name: galleryName
+  name: '${deployment().name}-gallery'
   params: {
     galleryName: galleryName
     location: location
