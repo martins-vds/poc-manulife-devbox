@@ -71,7 +71,7 @@ resource attachedNetwork 'Microsoft.DevCenter/devcenters/attachednetworks@2024-0
   }
 }
 
-resource devCenterDefaultEnvironmentDefinition 'Microsoft.DevCenter/devcenters/environmentTypes@2024-05-01-preview' = {
+resource devCenterEnvType 'Microsoft.DevCenter/devcenters/environmentTypes@2024-05-01-preview' = {
   parent: devCenter
   name: 'sandbox'
   properties: {
@@ -91,7 +91,22 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
         'EnvironmentDefinition'
       ]
     }    
-  }  
+  }
+
+  resource defaultEnvironment 'environmentTypes@2024-05-01-preview' = {
+    name: devCenterEnvType.name    
+    identity: {
+      type: 'SystemAssigned'
+    }
+    properties: {
+      deploymentTargetId: '/subscriptions/${subscription().subscriptionId}'
+      creatorRoleAssignment: {
+        roles: {
+          'b24988ac-6180-42a0-ab88-20f7382dd24c': {}
+        }
+      }
+    }
+  }
 }
 
 output principalId string = devCenter.identity.principalId

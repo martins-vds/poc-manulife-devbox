@@ -18,4 +18,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-az deployment group create -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
+# Lint the Bicep file
+az bicep build ./infra/main.bicep
+
+# Validate and deploy the Bicep file
+az deployment group validate -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
+az deployment group create -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep --rollback-on-error
