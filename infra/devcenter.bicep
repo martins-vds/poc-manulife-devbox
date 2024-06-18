@@ -40,17 +40,16 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
-resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-preview' = {
-  name: 'default-project'
-  location: location
+resource devCenterDefaultCatalog 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = {  
+  parent: devCenter
+  name: 'msft-quickstart-catalog'
   properties: {
-    devCenterId: devCenter.id
-    maxDevBoxesPerUser: 1
-    catalogSettings: {
-      catalogItemSyncTypes: [
-        'EnvironmentDefinition'
-      ]
-    }
+     gitHub: {
+      uri: 'https://github.com/microsoft/devcenter-catalog.git'
+      branch: 'main'
+      path: 'Environment-Definitions'
+     }
+     syncType: 'Scheduled'
   }
 }
 
@@ -70,6 +69,29 @@ resource attachedNetwork 'Microsoft.DevCenter/devcenters/attachednetworks@2024-0
   properties: {
     networkConnectionId: networkConnection.id
   }
+}
+
+resource devCenterDefaultEnvironmentDefinition 'Microsoft.DevCenter/devcenters/environmentTypes@2024-05-01-preview' = {
+  parent: devCenter
+  name: 'sandbox'
+  properties: {
+    displayName: 'Sandbox'    
+  }
+}
+
+// Projects
+resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-preview' = {
+  name: '${devCenterName}-default-project'
+  location: location
+  properties: {
+    devCenterId: devCenter.id
+    maxDevBoxesPerUser: 1
+    catalogSettings: {
+      catalogItemSyncTypes: [
+        'EnvironmentDefinition'
+      ]
+    }    
+  }  
 }
 
 output principalId string = devCenter.identity.principalId
