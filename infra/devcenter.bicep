@@ -3,7 +3,7 @@ param location string
 param vnetResourceGroupName string
 param subnetId string
 
-var deployVnet = true
+var deployVnet = false
 
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
   name: devCenterName
@@ -45,7 +45,7 @@ resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-pr
   location: location
   properties: {
     domainJoinType: 'AzureADJoin'
-    networkingResourceGroupName: vnetResourceGroupName
+    networkingResourceGroupName: '${vnetResourceGroupName}-devbox-networking'
     subnetId: subnetId
   }
 }
