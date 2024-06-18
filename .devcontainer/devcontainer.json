@@ -45,9 +45,8 @@
 				"python.venvPath": "~/.venv"
 			}			
 		}
-	},
-
-	"postCreateCommand": "git config --global --unset commit.gpgsign"
+	}
+	
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
