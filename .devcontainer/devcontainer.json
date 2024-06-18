@@ -32,8 +32,9 @@
         		"github.copilot-chat"
 			]
 		}
-	}
+	},
 
+	"postCreateCommand": "git config --global --unset commit.gpgsign"
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
@@ -42,7 +43,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-
+	
 	// Configure tool-specific properties.
 	// "customizations": {},
 
