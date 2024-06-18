@@ -105,6 +105,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
           'b24988ac-6180-42a0-ab88-20f7382dd24c': {}
         }
       }
+      status: 'Enabled'
     }
   }
 }

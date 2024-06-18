@@ -19,8 +19,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Lint the Bicep file
-az bicep build --file ./infra/main.bicep
+az bicep build --file ./infra/main.bicep --outdir /tmp
 
 # Validate and deploy the Bicep file
 az deployment group validate -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
-az deployment group create -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep --rollback-on-error
+az deployment group create -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
