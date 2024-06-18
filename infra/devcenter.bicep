@@ -40,6 +40,20 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
+resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-preview' = {
+  name: 'default-project'
+  location: location
+  properties: {
+    devCenterId: devCenter.id
+    maxDevBoxesPerUser: 1
+    catalogSettings: {
+      catalogItemSyncTypes: [
+        'EnvironmentDefinition'
+      ]
+    }
+  }
+}
+
 resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = if (deployVnet) {
   name: '${devCenterName}-network-connection'
   location: location
