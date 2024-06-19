@@ -1,5 +1,8 @@
 # Usage: ./deploy.sh <resource-group-name>
 
+set -e
+set -o pipefail
+
 resourceGroupName="$1"
 
 if [ -z "$resourceGroupName" ]; then
@@ -19,8 +22,15 @@ if [ $? -ne 0 ]; then
 fi
 
 # Lint the Bicep file
-az bicep build --file ./infra/main.bicep --outdir /tmp
+echo "linting bicep file..."
+az bicep build --only-show-errors --file ./infra/main.bicep --outdir /tmp
 
 # Validate and deploy the Bicep file
-az deployment group validate -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
-az deployment group create -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep
+echo "validating bicep file..."
+az deployment group validate --only-show-errors -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
+echo "starting what-if deployment..."
+az deployment group what-if --only-show-errors --no-pretty-print -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
+echo "starting deployment..."
+az deployment group create --only-show-errors -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep

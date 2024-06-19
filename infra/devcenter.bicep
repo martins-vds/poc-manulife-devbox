@@ -3,7 +3,7 @@ param location string
 param vnetResourceGroupName string
 param subnetId string
 
-var deployVnet = false
+var deployVnet = true
 
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
   name: devCenterName
