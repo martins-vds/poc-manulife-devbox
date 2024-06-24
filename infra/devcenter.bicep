@@ -120,7 +120,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
       networkConnectionName: networkConnection.name
       localAdministrator: 'Enabled'
       stopOnDisconnect: {
-        gracePeriodMinutes: 30
+        gracePeriodMinutes: 60
         status: 'Enabled'
       }
       singleSignOnStatus: 'Enabled'
