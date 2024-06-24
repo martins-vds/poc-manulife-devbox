@@ -90,7 +90,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
       catalogItemSyncTypes: [
         'EnvironmentDefinition'
       ]
-    }    
+    }       
   }
 
   resource defaultEnvironment 'environmentTypes@2024-05-01-preview' = {
@@ -106,6 +106,24 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
         }
       }
       status: 'Enabled'
+    }
+  }
+
+  resource pool 'pools@2024-05-01-preview' = {
+    name: 'default'
+    location: location
+    properties: {
+      devBoxDefinitionName: devCenterDevBoxDefinition.name
+      licenseType: 'Windows_Client'
+      virtualNetworkType: 'Unmanaged'
+      displayName: 'Default'
+      networkConnectionName: networkConnection.name
+      localAdministrator: 'Enabled'
+      stopOnDisconnect: {
+        gracePeriodMinutes: 30
+        status: 'Enabled'
+      }
+      singleSignOnStatus: 'Enabled'
     }
   }
 }
