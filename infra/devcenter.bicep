@@ -117,7 +117,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
       licenseType: 'Windows_Client'
       virtualNetworkType: 'Unmanaged'
       displayName: 'Default'
-      networkConnectionName: networkConnection.name
+      networkConnectionName: attachedNetwork.name
       localAdministrator: 'Enabled'
       stopOnDisconnect: {
         gracePeriodMinutes: 60
