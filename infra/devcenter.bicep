@@ -40,16 +40,16 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
-resource devCenterDefaultCatalog 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = {  
+resource devCenterDefaultCatalog 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = {
   parent: devCenter
   name: 'msft-quickstart-catalog'
   properties: {
-     gitHub: {
+    gitHub: {
       uri: 'https://github.com/microsoft/devcenter-catalog.git'
       branch: 'main'
       path: 'Environment-Definitions'
-     }
-     syncType: 'Scheduled'
+    }
+    syncType: 'Scheduled'
   }
 }
 
@@ -75,7 +75,7 @@ resource devCenterEnvType 'Microsoft.DevCenter/devcenters/environmentTypes@2024-
   parent: devCenter
   name: 'sandbox'
   properties: {
-    displayName: 'Sandbox'    
+    displayName: 'Sandbox'
   }
 }
 
@@ -90,11 +90,11 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
       catalogItemSyncTypes: [
         'EnvironmentDefinition'
       ]
-    }       
+    }
   }
 
   resource defaultEnvironment 'environmentTypes@2024-05-01-preview' = {
-    name: devCenterEnvType.name    
+    name: devCenterEnvType.name
     identity: {
       type: 'SystemAssigned'
     }
@@ -124,6 +124,17 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
         status: 'Enabled'
       }
       singleSignOnStatus: 'Enabled'
+    }
+
+    resource schedule 'schedules@2024-05-01-preview' = {
+      name: 'default'
+      properties: {
+        type: 'StopDevBox'
+        frequency: 'Daily'
+        time: '19:00'
+        timeZone: 'America/Edmonton'
+        state: 'Enabled'
+      }
     }
   }
 }
