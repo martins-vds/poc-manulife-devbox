@@ -27,7 +27,7 @@ jobs:
     - name: Generate Deployment Name
       id: deploymentName
       run: |
-        deploymentName="devbox-deployment-github-${{ github.run_id }}"  
+        deploymentName="deployment-gh-${{ github.run_id }}"  
         echo "deploymentName=$deploymentName" >> "$GITHUB_OUTPUT"
 
     - name: Validate Bicep file
