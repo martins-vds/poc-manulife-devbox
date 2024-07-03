@@ -4,8 +4,9 @@ on:
 name: Create Custom VM Image
 
 jobs:
-  build-image:
-    runs-on: ubuntu-latest    
+  build-image-dev:
+    runs-on: ubuntu-latest
+    environment: dev  
     steps:
     - name: Checkout
       uses: actions/checkout@v2    
@@ -35,20 +36,12 @@ jobs:
       id: imageBuilder
       uses: azure/build-vm-image@v0
       with:
-        location: 'eastus2'
-        resource-group-name: '{rgName}'
-        managed-identity: '{Identity}' # Managed identity
+        location: '${{ vars.LOCATION }}'
+        resource-group-name: '${{ vars.RESOURCE_GROUP }}'
+        managed-identity: '${{ secrets.USER_MANAGED_IDENTITY_ID }}' # Managed identity
         source-os-type: 'windows'
         source-image-type: 'platformImage'
         source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
-        dist-resource-id: '/subscriptions/{subscriptionID}/resourceGroups/{rgName}/providers/Microsoft.Compute/galleries/{galleryName}/images/{imageName}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
-        dist-location: 'eastus2'
-
-    - name: CREATE VM
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.0.72
-        inlineScript: |
-          az vm create --resource-group ghactions-vMimage  --name "app-vm-${{ GITHUB.RUN_NUMBER }}"  --admin-username myuser --admin-password "${{ secrets.VM_PWD }}" --location  eastus2 \
-            --image "${{ steps.imageBuilder.outputs.custom-image-uri }}"
+        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ vars.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+        dist-location: '${{ vars.LOCATION }}'    
