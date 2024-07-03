@@ -54,7 +54,7 @@ jobs:
         parameters: 'location=${{ vars.LOCATION }}'
         failOnStdErr: false
         deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
-        scope: 'resource-group'
+        scope: 'resourcegroup'
 
   build-image-dev:
     runs-on: ubuntu-latest
