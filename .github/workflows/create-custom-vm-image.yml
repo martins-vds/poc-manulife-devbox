@@ -3,6 +3,9 @@ name: Create Custom VM Image
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+
 jobs:
   deploy-infra-dev:
     runs-on: ubuntu-latest
