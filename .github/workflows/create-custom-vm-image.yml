@@ -12,7 +12,7 @@ jobs:
     environment: dev
     outputs:
       galleryName: ${{ steps.deploy.outputs.galleryName }}
-      imageBuilderId: ${{ steps.deploy.outputs.imageBuilderId }}
+      imageBuilderId: '${{ steps.deploy.outputs.imageBuilderId }}'
     steps:
     - name: Checkout
       uses: actions/checkout@v2    
@@ -76,7 +76,7 @@ jobs:
       uses: azure/build-vm-image@v0
       env:
         GALLERY_NAME: ${{ needs.deploy-infra-dev.outputs.galleryName }}
-        MANAGED_IDENTITY: ${{ needs.deploy-infra-dev.outputs.imageBuilderId }}
+        MANAGED_IDENTITY: '${{ needs.deploy-infra-dev.outputs.imageBuilderId }}'
       with:
         location: '${{ vars.LOCATION }}'
         resource-group-name: '${{ vars.RESOURCE_GROUP }}'

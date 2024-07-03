@@ -7,6 +7,7 @@ This project is a proof of concept (POC) to demonstrate the use of Microsoft Dev
 ## Notes
 
 - It is possible that the deployment fails due to Network Connections quota limitations. If this happens, submit a request to increase the quota.
+- Repositories that contain DevBox catalog definitions must install the DevCenter GitHub App. This app is responsible for creating the DevBox catalog and updating the DevBox catalog.
 
 ## Instructions
 
