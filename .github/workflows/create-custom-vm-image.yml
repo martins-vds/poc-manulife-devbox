@@ -1,7 +1,7 @@
+name: Create Custom VM Image
+
 on:
   workflow_dispatch:
-
-name: Create Custom VM Image
 
 jobs:
   build-image-dev:
