@@ -1,0 +1,103 @@
+name: Create Custom VM Image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+
+jobs:
+  deploy-infra-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      galleryName: ${{ steps.deploy.outputs.galleryName }}
+      imageBuilderPrincipalId: ${{ steps.deploy.outputs.imageBuilderPrincipalId }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2    
+
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  
+    - name: Generate Deployment Name
+      id: deploymentName
+      run: |
+        deploymentName="deployment-gh-${{ github.run_id }}"  
+        echo "deploymentName=$deploymentName" >> "$GITHUB_OUTPUT"
+
+    - name: Validate Bicep file
+      env:
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+      run: |
+        az deployment group validate --only-show-errors -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
+    - name: Run What-If Deployment
+      env:
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+      run: |
+        az deployment group what-if --only-show-errors --no-pretty-print -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
+    - name: Deploy Bicep file
+      uses: azure/arm-deploy@v2
+      id: deploy
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+        template: ./infra/main.bicep
+        parameters: 'location=${{ vars.LOCATION }}'
+        failOnStdErr: false
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+        scope: 'resourcegroup'
+
+  build-image-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [deploy-infra-dev]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2    
+
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Setup Java 1.8.x
+      uses: actions/setup-java@v1
+      with:
+        java-version: '1.8.x'
+        
+    - name: Build Java
+      run: mvn --batch-mode --update-snapshots verify
+
+    - run: mkdir staging && cp target/*.jar staging
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Package
+        path: staging
+
+    - name: Create App Baked Image
+      id: imageBuilder
+      uses: azure/build-vm-image@v0
+      env:
+        GALLERY_NAME: ${{ needs.deploy-infra-dev.outputs.galleryName }}
+        MANAGED_IDENTITY: ${{ needs.deploy-infra-dev.outputs.imageBuilderPrincipalId }}
+      with:
+        location: '${{ vars.LOCATION }}'
+        resource-group-name: '${{ vars.RESOURCE_GROUP }}'
+        managed-identity: '${{ env.MANAGED_IDENTITY }}' # Managed identity
+        source-os-type: 'windows'
+        source-image-type: 'platformImage'
+        source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
+        dist-type: 'SharedImageGallery'
+        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+        dist-location: '${{ vars.LOCATION }}'    

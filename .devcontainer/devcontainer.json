@@ -43,7 +43,8 @@
 				"github.copilot-chat",
 				"mads-hartmann.bash-ide-vscode",
 				"rogalmic.bash-debug",
-				"foxundermoon.shell-format"
+				"foxundermoon.shell-format",
+				"GitHub.vscode-pull-request-github"
 			],
 			"settings": {
 				"python.defaultInterpreterPath": "/usr/local/bin/python",
