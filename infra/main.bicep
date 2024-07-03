@@ -1,3 +1,6 @@
+import { devCenterCatalogArray } from './types.bicep'
+
+param catalogs devCenterCatalogArray = []
 param location string = resourceGroup().location
 
 var uniqueness = uniqueString(resourceGroup().id)
@@ -21,6 +24,7 @@ module devcenter 'devcenter.bicep' = {
     location: location    
     vnetResourceGroupName: network.outputs.resourceGroupName
     subnetId: network.outputs.defaultSubnetId
+    catalogs: catalogs
   }
 }
 
@@ -45,4 +49,5 @@ module gallery 'gallery.bicep' = {
 }
 
 output galleryName string = gallery.outputs.galleryName
+output imageBuilderId string = imageBuilder.outputs.id
 output imageBuilderPrincipalId string = imageBuilder.outputs.principalId

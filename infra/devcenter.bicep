@@ -1,8 +1,21 @@
+import { devCenterCatalogArray } from './types.bicep'
+
 param devCenterName string
+param catalogs devCenterCatalogArray = []
 param location string
 param vnetResourceGroupName string
 param subnetId string
 
+var finalCatalogs = empty(catalogs) ? [
+  {
+    name: 'msft-quickstart-catalog'
+    gitHub: {
+      uri: 'https://github.com/microsoft/devcenter-catalog.git'
+      branch: 'main'
+      path: 'Environment-Definitions'
+    }
+  }
+] : catalogs
 var deployVnet = true
 
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
@@ -40,18 +53,18 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
-resource devCenterDefaultCatalog 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = {
+resource devCenterCatalogs 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = [ for catalog in finalCatalogs : {
   parent: devCenter
-  name: 'msft-quickstart-catalog'
+  name: catalog.name
   properties: {
     gitHub: {
-      uri: 'https://github.com/microsoft/devcenter-catalog.git'
-      branch: 'main'
-      path: 'Environment-Definitions'
+      uri: catalog.gitHub.uri
+      branch: catalog.gitHub.branch
+      path: catalog.gitHub.path
     }
     syncType: 'Scheduled'
   }
-}
+}]
 
 resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = if (deployVnet) {
   name: '${devCenterName}-network-connection'

@@ -12,7 +12,7 @@ jobs:
     environment: dev
     outputs:
       galleryName: ${{ steps.deploy.outputs.galleryName }}
-      imageBuilderPrincipalId: ${{ steps.deploy.outputs.imageBuilderPrincipalId }}
+      imageBuilderId: ${{ steps.deploy.outputs.imageBuilderId }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2    
@@ -51,7 +51,7 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ vars.RESOURCE_GROUP }}
         template: ./infra/main.bicep
-        parameters: 'location=${{ vars.LOCATION }}'
+        parameters: 'location=${{ vars.LOCATION }} catalogs=@catalogs.json'
         failOnStdErr: false
         deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
         scope: 'resourcegroup'
@@ -76,7 +76,7 @@ jobs:
       uses: azure/build-vm-image@v0
       env:
         GALLERY_NAME: ${{ needs.deploy-infra-dev.outputs.galleryName }}
-        MANAGED_IDENTITY: ${{ needs.deploy-infra-dev.outputs.imageBuilderPrincipalId }}
+        MANAGED_IDENTITY: ${{ needs.deploy-infra-dev.outputs.imageBuilderId }}
       with:
         location: '${{ vars.LOCATION }}'
         resource-group-name: '${{ vars.RESOURCE_GROUP }}'

@@ -14,5 +14,6 @@ resource imageBuilderIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   location: location
 }
 
+output id string = imageBuilderIdentity.id
 output principalId string = imageBuilderIdentity.properties.principalId
 output roleId string = imageBuilderRole.outputs.roleDefinitionID

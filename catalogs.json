@@ -1,0 +1,10 @@
+[
+    {
+        "name": "customizations",
+        "gitHub": {
+            "uri": "https://github.com/martins-vds/poc-manulife-devbox.git",
+            "branch": "main",
+            "path": "customizations"
+        }
+    }
+]
