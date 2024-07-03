@@ -71,21 +71,7 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Setup Java 1.8.x
-      uses: actions/setup-java@v1
-      with:
-        java-version: '1.8.x'
-        
-    - name: Build Java
-      run: mvn --batch-mode --update-snapshots verify
-
-    - run: mkdir staging && cp target/*.jar staging
-    - uses: actions/upload-artifact@v2
-      with:
-        name: Package
-        path: staging
-
-    - name: Create App Baked Image
+    - name: Build Custom Image
       id: imageBuilder
       uses: azure/build-vm-image@v0
       env:
