@@ -1,6 +1,8 @@
 param galleryName string
 param devCenterName string
 param devCenterPrincipalId string
+param imageBuilderPrincipalId string
+param imageBuilderRoleId string
 param location string
 
 var contributorRoleDefinitionId = subscriptionResourceId(
@@ -26,6 +28,15 @@ resource galleryContributorRoleAssignment 'Microsoft.Authorization/roleAssignmen
   }
 }
 
+resource galleryImageBuilderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(gallery.id, imageBuilderPrincipalId, imageBuilderRoleId)
+  scope: gallery
+  properties: {
+    principalId: imageBuilderPrincipalId
+    roleDefinitionId: imageBuilderRoleId
+  }
+}
+
 resource devCenterExternalGallery 'Microsoft.DevCenter/devcenters/galleries@2024-05-01-preview' = {
   parent: devCenter
   name: 'External'
@@ -37,3 +48,5 @@ resource devCenterExternalGallery 'Microsoft.DevCenter/devcenters/galleries@2024
     galleryContributorRoleAssignment
   ]
 }
+
+output galleryName string = gallery.name

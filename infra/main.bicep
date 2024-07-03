@@ -4,6 +4,7 @@ var uniqueness = uniqueString(resourceGroup().id)
 var galleryName = 'gallery${uniqueness}'
 var vnetName = 'vnet${uniqueness}'
 var devCenterName = 'devcenter${uniqueness}'
+var imageBuilderName = 'imagebuilder${uniqueness}'
 
 module network 'network.bicep' = {
   name: '${deployment().name}-network'
@@ -23,6 +24,14 @@ module devcenter 'devcenter.bicep' = {
   }
 }
 
+module imageBuilder 'image-builder.bicep' = {
+  name: '${deployment().name}-imageBuilder'
+  params: {
+    imageBuilderName: imageBuilderName
+    location: location
+  }
+}
+
 module gallery 'gallery.bicep' = {
   name: '${deployment().name}-gallery'
   params: {
@@ -30,5 +39,10 @@ module gallery 'gallery.bicep' = {
     location: location
     devCenterName: devCenterName
     devCenterPrincipalId: devcenter.outputs.principalId
+    imageBuilderPrincipalId: imageBuilder.outputs.principalId
+    imageBuilderRoleId: imageBuilder.outputs.roleId
   }
 }
+
+output galleryName string = gallery.outputs.galleryName
+output imageBuilderPrincipalId string = imageBuilder.outputs.principalId

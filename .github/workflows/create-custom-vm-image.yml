@@ -4,9 +4,38 @@ on:
   workflow_dispatch:
 
 jobs:
+  deploy-infra-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      galleryName: ${{ steps.deploy.outputs.galleryName }}
+      imageBuilderPrincipalId: ${{ steps.deploy.outputs.imageBuilderPrincipalId }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2    
+
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  
+    - name: Deploy Bicep file
+      uses: azure/arm-deploy@v2
+      id: deploy
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+        template: ./infra/main.bicep
+        parameters: 'location=${{ vars.LOCATION }}'
+        failOnStdErr: false
+        scope: 'resource-group'
+
   build-image-dev:
     runs-on: ubuntu-latest
-    environment: dev  
+    environment: dev
+    needs: [deploy-infra-dev]
     steps:
     - name: Checkout
       uses: actions/checkout@v2    
@@ -35,13 +64,16 @@ jobs:
     - name: Create App Baked Image
       id: imageBuilder
       uses: azure/build-vm-image@v0
+      env:
+        GALLERY_NAME: ${{ needs.deploy-infra-dev.outputs.galleryName }}
+        MANAGED_IDENTITY: ${{ needs.deploy-infra-dev.outputs.imageBuilderPrincipalId }}
       with:
         location: '${{ vars.LOCATION }}'
         resource-group-name: '${{ vars.RESOURCE_GROUP }}'
-        managed-identity: '${{ secrets.USER_MANAGED_IDENTITY_ID }}' # Managed identity
+        managed-identity: '${{ env.MANAGED_IDENTITY }}' # Managed identity
         source-os-type: 'windows'
         source-image-type: 'platformImage'
         source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
-        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ vars.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
         dist-location: '${{ vars.LOCATION }}'    
