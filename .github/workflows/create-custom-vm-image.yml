@@ -21,6 +21,26 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   
+    - name: Generate Deployment Name
+      id: deploymentName
+      run: |
+        deploymentName="devbox-deployment-github-${{ github.run_id }}"  
+        echo "deploymentName=$deploymentName" >> "$GITHUB_OUTPUT"
+
+    - name: Validate Bicep file
+      env:
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+      run: |
+        az deployment group validate --only-show-errors -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
+    - name: Run What-If Deployment
+      env:
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+        resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+      run: |
+        az deployment group what-if --only-show-errors --no-pretty-print -n $deploymentName -g $resourceGroupName --template-file ./infra/main.bicep > /dev/null
+
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v2
       id: deploy
@@ -30,6 +50,7 @@ jobs:
         template: ./infra/main.bicep
         parameters: 'location=${{ vars.LOCATION }}'
         failOnStdErr: false
+        deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
         scope: 'resource-group'
 
   build-image-dev:
