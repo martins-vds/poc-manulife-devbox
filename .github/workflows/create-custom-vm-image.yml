@@ -86,7 +86,7 @@ jobs:
         source-image-type: 'platformImage'
         source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
-        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+        # dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
         dist-location: '${{ vars.LOCATION }}'
 
     - name: Create Custom Image
@@ -104,5 +104,5 @@ jobs:
         source-image-type: 'platformImage'
         source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
-        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}' #Replace with the resource id of your shared image  gallery's image definition
+        # dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ env.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}' #Replace with the resource id of your shared image  gallery's image definition
         dist-location: '${{ vars.LOCATION }}'
