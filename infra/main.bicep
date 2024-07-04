@@ -50,4 +50,5 @@ module gallery 'gallery.bicep' = {
 
 output galleryName string = gallery.outputs.galleryName
 output imageBuilderId string = imageBuilder.outputs.id
+output imageBuilderName string = imageBuilder.outputs.name
 output imageBuilderPrincipalId string = imageBuilder.outputs.principalId
