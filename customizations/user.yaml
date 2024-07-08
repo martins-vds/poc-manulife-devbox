@@ -1,0 +1,8 @@
+$schema: "1.0"
+name: "devbox-customization"
+tasks:
+  - name: winget
+    description: 'User-based Customizations including: Visual Studio Code with extentions'
+    parameters:
+      configurationFile: 'c:\src\poc-manulife-devbox\customizations\winget\user-customizations.yaml'
+      runAsUser: true
