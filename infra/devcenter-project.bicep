@@ -2,6 +2,7 @@ import { devCenterProject } from './types.bicep'
 
 param devCenterName string
 param devCenterProjectParams devCenterProject
+param baseDevBoxDefinitionName string
 param location string
 
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' existing = {
@@ -53,7 +54,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
     name: 'default'
     location: location
     properties: {
-      devBoxDefinitionName: devCenterProjectParams.devBoxDefinitionName
+      devBoxDefinitionName: empty(devCenterProjectParams.devBoxDefinitionName) ? baseDevBoxDefinitionName : devCenterProjectParams.devBoxDefinitionName
       licenseType: 'Windows_Client'
       virtualNetworkType: 'Unmanaged'
       displayName: 'Default Pool'

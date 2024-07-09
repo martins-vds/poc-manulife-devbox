@@ -1,6 +1,5 @@
 {
-    "devCenter": "",
-    "projectName": "",
+    "projectName": "New Project",
     "devBoxDefinitionName": "default-project",
     "catalogs": [
         {
@@ -15,7 +14,7 @@
     "environmentTypes": [
         {
             "name": "sandbox",
-            "subscriptionId": "/subscriptions/1b1b1b1b-1b1b-1b1b-1b1b-1b1b1b1b1b1b",
+            "subscriptionId": "/subscriptions/b4f386c5-01b1-4e35-a838-9f305b31f47d",
             "roles": {
                 "b24988ac-6180-42a0-ab88-20f7382dd24c": {}
             }

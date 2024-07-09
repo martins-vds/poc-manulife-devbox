@@ -2,14 +2,23 @@ name: Create Custom VM Image
 
 on:
   workflow_dispatch:
+    inputs:
+      env:
+        description: 'The environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
 
 permissions:
   id-token: write
-
+  contents: write
+  
 jobs:
   deploy-infra-dev:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ github.event.inputs.env }}
     outputs:
       galleryName: ${{ steps.deploy.outputs.galleryName }}
       imageBuilderIdentityName: '${{ steps.deploy.outputs.imageBuilderName }}'
@@ -63,30 +72,38 @@ jobs:
         retries: 3
         retry-exempt-status-codes: 400,401
         script: |
-          const environment = 'dev'
-          const galleryName = '${{ steps.deploy.outputs.galleryName }}'
-          const devCenterName = '${{ steps.deploy.outputs.devCenterName }}'
-          const imageBuilderIdentityName = '${{ steps.deploy.outputs.imageBuilderName }}'
           const owner = '${{ github.repository_owner }}'
           const repository = '${{ github.repository }}'.split('/')[1]
+          const environment = '${{ github.event.inputs.env }}'
 
-          github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
-            owner: owner,
-            repo: repository,
-            environment_name: environment,
-            name: 'galleryName',
-            value: galleryName,
-            headers: {
-              'X-GitHub-Api-Version': '2022-11-28'
-            }
-          })
-          github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
-            owner: owner,
-            repo: repository,
-            environment_name: environment,
-            name: 'devCenterName',
-            value: devCenterName,
-            headers: {
-              'X-GitHub-Api-Version': '2022-11-28'
-            }
-          })
+          const variables = [
+              {
+                  name: 'GALLERY_NAME',
+                  value: '${{ steps.deploy.outputs.galleryName }}'
+              },
+              {
+                  name: 'DEV_CENTER_NAME',
+                  value: '${{ steps.deploy.outputs.devCenterName }}'
+              },
+              {
+                  name: 'IMAGE_BUILDER_MANAGED_IDENTITY_NAME',
+                  value: '${{ steps.deploy.outputs.imageBuilderManagedIdentityName }}'
+              },
+              {
+                  name: 'BASE_DEV_BOX_DEFINITION_NAME',
+                  value: '${{ steps.deploy.outputs.devBoxDefinitionName }}'
+              }
+          ]
+
+          variables.forEach(variable => {
+              github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
+                  owner: owner,
+                  repo: repository,
+                  environment_name: environment,
+                  name: variable.name,
+                  value: variable.value,
+                  headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                  }
+                })
+          });

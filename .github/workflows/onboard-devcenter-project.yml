@@ -7,10 +7,17 @@ on:
                 description: 'The name of the project to onboard'
                 required: true
                 default: 'default-project'
+            env:
+                description: 'The environment to deploy to'
+                required: true
+                default: 'dev'
+                type: choice
+                options:
+                - dev
 jobs:
     onboard-project:
         runs-on: ubuntu-latest
-        environment: dev
+        environment: ${{ github.event.inputs.env }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4.1.7
@@ -25,7 +32,7 @@ jobs:
             - name: Generate Deployment Name
               id: deploymentName
               run: |
-                  deploymentName="deployment-gh-${{ github.run_id }}"  
+                  deploymentName="deploy-proj-gh-${{ github.run_id }}"  
                   echo "deploymentName=$deploymentName" >> "$GITHUB_OUTPUT"
 
             - name: Validate Project Configuration
@@ -55,7 +62,7 @@ jobs:
                 subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 resourceGroupName: ${{ vars.RESOURCE_GROUP }}
                 template: ./infra/devcenter-project.bicep
-                parameters: 'location=${{ vars.LOCATION }} devCenterProjectParams=${{ steps.projectConfig.outputs.projectConfigFile }}'
+                parameters: 'location=${{ vars.LOCATION }} devCenterProjectParams=${{ steps.projectConfig.outputs.projectConfigFile }} devCenterName=${{ vars.DEV_CENTER_NAME }} baseDevBoxDefinitionName=${{ vars.BASE_DEV_BOX_DEFINITION_NAME }}'
                 failOnStdErr: false
                 deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
                 scope: 'resourcegroup'

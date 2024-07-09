@@ -157,4 +157,5 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
 }
 
 output name string = devCenter.name
+output baseDevBoxDefinitionName string = devCenterDevBoxDefinition.name
 output principalId string = devCenter.identity.principalId

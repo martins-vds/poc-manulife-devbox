@@ -1,0 +1,54 @@
+on:
+    workflow_dispatch:
+        inputs:
+            env:
+                description: 'The environment to deploy to'
+                required: true
+                default: 'dev'
+                type: choice
+                options:
+                    - dev
+jobs:
+    build-image-dev:
+        runs-on: ubuntu-latest
+        environment: ${{ github.event.inputs.env }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4.1.7   
+
+        - name: Login via Az module
+          uses: azure/login@v2.1.1
+          with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - name: Update Custom Image
+          id: imageBuilderWithVersion
+          uses: azure/build-vm-image@v0.1.1
+          continue-on-error: true
+          with:
+              location: '${{ vars.LOCATION }}'
+              resource-group-name: '${{ vars.RESOURCE_GROUP }}'
+              managed-identity: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${{ vars.IMAGE_BUILDER_MANAGED_IDENTITY_NAME }}'
+              source-os-type: 'windows'
+              source-image-type: 'platformImage'
+              source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
+              dist-type: 'SharedImageGallery'
+              # dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ vars.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+              dist-location: '${{ vars.LOCATION }}'
+
+        - name: Create Custom Image
+          id: imageBuilder
+          uses: azure/build-vm-image@v0.1.1
+          if: ${{ steps.imageBuilderWithVersion.outcome == 'failure' }} 
+          with:
+              location: '${{ vars.LOCATION }}'
+              resource-group-name: '${{ vars.RESOURCE_GROUP }}'
+              managed-identity: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${{ vars.IMAGE_BUILDER_MANAGED_IDENTITY_NAME }}'
+              source-os-type: 'windows'
+              source-image-type: 'platformImage'
+              source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
+              dist-type: 'SharedImageGallery'
+              # dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.RESOURCE_GROUP }}/providers/Microsoft.Compute/galleries/${{ vars.GALLERY_NAME }}/images/${{ vars.IMAGE_NAME }}' #Replace with the resource id of your shared image  gallery's image definition
+              dist-location: '${{ vars.LOCATION }}'
