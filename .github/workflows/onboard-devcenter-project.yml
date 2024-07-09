@@ -1,0 +1,61 @@
+name: 'Onboard DevCenter Project'
+
+on:
+    workflow_dispatch: 
+        inputs:
+            project-name:
+                description: 'The name of the project to onboard'
+                required: true
+                default: 'default-project'
+jobs:
+    onboard-project:
+        runs-on: ubuntu-latest
+        environment: dev
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4.1.7
+            
+            - name: Login via Az module
+              uses: azure/login@v2.1.1
+              with:
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+            - name: Generate Deployment Name
+              id: deploymentName
+              run: |
+                  deploymentName="deployment-gh-${{ github.run_id }}"  
+                  echo "deploymentName=$deploymentName" >> "$GITHUB_OUTPUT"
+
+            - name: Validate Project Configuration
+              id: projectConfig
+              run: |
+                # Replace spaces with dash and lower case project name
+                projectName=$(echo ${{ github.event.inputs.project-name }} | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+                projectFolder="./projects/$projectName"
+
+                # Check if project folder and configuration file exist
+                if [ ! -d $projectFolder ]; then
+                  echo "Project folder '$projectFolder' does not exist"
+                  exit 1
+                fi
+
+                if [ ! -f "$projectFolder/project.json" ]; then
+                  echo "Project config file does not exist under '$projectFolder'."
+                  exit 1
+                fi
+
+                echo "projectConfigFile=$projectFolder/project.json" >> "$GITHUB_OUTPUT"
+
+            - name: Deploy Bicep file
+              uses: azure/arm-deploy@v2
+              id: deploy
+              with:
+                subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                resourceGroupName: ${{ vars.RESOURCE_GROUP }}
+                template: ./infra/devcenter-project.bicep
+                parameters: 'location=${{ vars.LOCATION }} devCenterProjectParams=${{ steps.projectConfig.outputs.projectConfigFile }}'
+                failOnStdErr: false
+                deploymentName: ${{ steps.deploymentName.outputs.deploymentName }}
+                scope: 'resourcegroup'

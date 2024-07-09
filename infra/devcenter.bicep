@@ -5,18 +5,20 @@ param catalogs devCenterCatalogArray = []
 param location string
 param vnetResourceGroupName string
 param subnetId string
+param deployDefaultProject bool = false
 
-var finalCatalogs = empty(catalogs) ? [
-  {
-    name: 'msft-quickstart-catalog'
-    gitHub: {
-      uri: 'https://github.com/microsoft/devcenter-catalog.git'
-      branch: 'main'
-      path: 'Environment-Definitions'
-    }
-  }
-] : catalogs
-var deployVnet = true
+var finalCatalogs = empty(catalogs)
+  ? [
+      {
+        name: 'msft-quickstart-catalog'
+        gitHub: {
+          uri: 'https://github.com/microsoft/devcenter-catalog.git'
+          branch: 'main'
+          path: 'Environment-Definitions'
+        }
+      }
+    ]
+  : catalogs
 
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' = {
   name: devCenterName
@@ -53,20 +55,22 @@ resource devCenterDevBoxDefinition 'Microsoft.DevCenter/devcenters/devboxdefinit
   }
 }
 
-resource devCenterCatalogs 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = [ for catalog in finalCatalogs : {
-  parent: devCenter
-  name: catalog.name
-  properties: {
-    gitHub: {
-      uri: catalog.gitHub.uri
-      branch: catalog.gitHub.branch
-      path: catalog.gitHub.path
+resource devCenterCatalogs 'Microsoft.DevCenter/devcenters/catalogs@2024-05-01-preview' = [
+  for catalog in finalCatalogs: {
+    parent: devCenter
+    name: catalog.name
+    properties: {
+      gitHub: {
+        uri: catalog.gitHub.uri
+        branch: catalog.gitHub.branch
+        path: catalog.gitHub.path
+      }
+      syncType: 'Scheduled'
     }
-    syncType: 'Scheduled'
   }
-}]
+]
 
-resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = if (deployVnet) {
+resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-preview' = {
   name: '${devCenterName}-network-connection'
   location: location
   properties: {
@@ -76,7 +80,7 @@ resource networkConnection 'Microsoft.DevCenter/networkConnections@2024-05-01-pr
   }
 }
 
-resource attachedNetwork 'Microsoft.DevCenter/devcenters/attachednetworks@2024-05-01-preview' = if (deployVnet) {
+resource attachedNetwork 'Microsoft.DevCenter/devcenters/attachednetworks@2024-05-01-preview' = {
   parent: devCenter
   name: 'default-attached-network'
   properties: {
@@ -93,7 +97,7 @@ resource devCenterEnvType 'Microsoft.DevCenter/devcenters/environmentTypes@2024-
 }
 
 // Projects
-resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-preview' = {
+resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-preview' = if (deployDefaultProject) {
   name: '${devCenterName}-default-project'
   location: location
   properties: {
@@ -152,4 +156,5 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
   }
 }
 
+output name string = devCenter.name
 output principalId string = devCenter.identity.principalId

@@ -10,3 +10,21 @@ type devCenterCatalog = {
 
 @export()
 type devCenterCatalogArray = devCenterCatalog[]
+
+@export()
+type devBoxEnvironmentType = {
+  name: string
+  subscriptionId: string
+  roles: object
+}
+
+@export()
+type devCenterEnvironmentTypeArray = devBoxEnvironmentType[]
+
+@export()
+type devCenterProject = {
+  devBoxDefinitionName: string
+  projectName: string
+  catalogs: devCenterCatalogArray
+  environmentTypes: devCenterEnvironmentTypeArray
+}

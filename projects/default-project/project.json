@@ -1,0 +1,24 @@
+{
+    "devCenter": "",
+    "projectName": "",
+    "devBoxDefinitionName": "default-project",
+    "catalogs": [
+        {
+            "name": "customizations",
+            "gitHub": {
+                "uri": "https://github.com/martins-vds/poc-manulife-devbox.git",
+                "branch": "main",
+                "path": "projects/default-project/customizations"
+            }
+        }
+    ],
+    "environmentTypes": [
+        {
+            "name": "sandbox",
+            "subscriptionId": "/subscriptions/1b1b1b1b-1b1b-1b1b-1b1b-1b1b1b1b1b1b",
+            "roles": {
+                "b24988ac-6180-42a0-ab88-20f7382dd24c": {}
+            }
+        }
+    ]
+}
