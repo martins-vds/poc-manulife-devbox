@@ -8,6 +8,7 @@ This project is a proof of concept (POC) to demonstrate the use of Microsoft Dev
 
 - It is possible that the deployment fails due to Network Connections quota limitations. If this happens, submit a request to increase the quota.
 - Repositories that contain DevBox catalog definitions must install the DevCenter GitHub App. This app is responsible for creating the DevBox catalog and updating the DevBox catalog.
+- Create a new repository secret named 'MANAGE_ENV_VARS_PAT' with a fined-grained Personal Access Token (PAT) that has the "Variables" repository permissions (write) and "Environments" repository permissions (write). This PAT is used to update the environment variables in the repository.
 
 ## Instructions
 
