@@ -1,4 +1,4 @@
-name: Create Custom VM Image
+name: Provision Dev Center
 
 on:
   workflow_dispatch:

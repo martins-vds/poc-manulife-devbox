@@ -1,3 +1,5 @@
+name: Create Custom VM Image
+
 on:
     workflow_dispatch:
         inputs:
