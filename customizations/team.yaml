@@ -1,0 +1,13 @@
+$schema: "1.0"
+name: "devbox-customization"
+tasks:
+  - name: git-clone
+    description: 'Clone this repository into C:\src'
+    parameters:
+      repositoryUrl: https://github.com/martins-vds/poc-manulife-devbox.git
+      directory: c:\src
+  - name: winget
+    description: 'Team-based Customizations including: .NET Aspire, Azure Deployment with AZD, Visual Studio 2022 Enterprise'
+    parameters:
+      configurationFile: 'c:\src\poc-manulife-devbox\customizations\winget\team-customizations.yaml'
+      runAsUser: true
