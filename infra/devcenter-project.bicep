@@ -38,7 +38,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
 
   resource projectCatalogs 'catalogs@2024-05-01-preview' = [
     for catalog in devCenterProjectParams.catalogs: {
-      name: catalog.name
+      name: '${catalog.name}-${uniqueString(devCenterName, devCenterProjectParams.projectName, catalog.name)}'
       properties: {
         gitHub: {
           uri: catalog.gitHub.uri
