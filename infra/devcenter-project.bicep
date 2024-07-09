@@ -1,6 +1,7 @@
 import { devCenterProject } from './types.bicep'
 
 param devCenterName string
+param devCenterAttachedNetworkName string
 param devCenterProjectParams devCenterProject
 param baseDevBoxDefinitionName string
 param location string
@@ -58,7 +59,7 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
       licenseType: 'Windows_Client'
       virtualNetworkType: 'Unmanaged'
       displayName: 'Default Pool'
-      networkConnectionName: '${devCenter.name}-network-connection'
+      networkConnectionName: devCenterAttachedNetworkName
       localAdministrator: 'Enabled'
       stopOnDisconnect: {
         gracePeriodMinutes: 60

@@ -49,6 +49,7 @@ module gallery 'gallery.bicep' = {
 }
 
 output devCenterName string = devcenter.outputs.name
+output devCenterAttachedNetworkName string = devcenter.outputs.attachedNetworkName
 output devBoxDefinitionName string = devcenter.outputs.baseDevBoxDefinitionName
 output galleryName string = gallery.outputs.galleryName
 output imageBuilderId string = imageBuilder.outputs.id
