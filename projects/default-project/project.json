@@ -1,6 +1,6 @@
 {
     "projectName": "new_project",
-    "devBoxDefinitionName": "default-project",
+    "devBoxDefinitionName": "",
     "catalogs": [
         {
             "name": "customizations",
