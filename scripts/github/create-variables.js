@@ -35,7 +35,7 @@ export default async function createVariables({ github, context }, environment, 
                 });
 
                 return {
-                    variable: variable,
+                    variable: variable.name,
                     data: data
                 };
             } catch (error) {
@@ -55,7 +55,7 @@ export default async function createVariables({ github, context }, environment, 
                 });
 
                 return {
-                    variable: variable,
+                    variable: variable.name,
                     data: data
                 };
             }
