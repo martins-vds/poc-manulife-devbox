@@ -64,7 +64,6 @@ jobs:
         scope: 'resourcegroup'
 
     - uses: actions/github-script@v7
-      id: setEnvVars
       name: Set Environment Variables
       with:
         github-token: ${{ secrets.MANAGE_ENV_VARS_PAT }}
@@ -72,10 +71,8 @@ jobs:
         debug: true
         retry-exempt-status-codes: 400,401
         script: |
-          const owner = '${{ github.repository_owner }}'
-          const repository = '${{ github.repository }}'.split('/')[1]
+          const { default: createVariables } = await import('${{ github.workspace }}/src/create-Variables.js')
           const environment = '${{ github.event.inputs.env }}'
-
           const variables = [
               {
                   name: 'GALLERY_NAME',
@@ -98,33 +95,4 @@ jobs:
                   value: '${{ steps.deploy.outputs.devCenterAttachedNetworkName }}'
               }
           ]
-
-          Promise.allSettled(variables.map(variable => async () => {
-              try {
-                  console.log(`Creating variable ${variable.name}...`)
-                  await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
-                      owner: owner,
-                      repo: repository,
-                      environment_name: environment,
-                      name: variable.name,
-                      value: variable.value,
-                      headers: {
-                          'X-GitHub-Api-Version': '2022-11-28'
-                      }
-                  })
-              } catch (error) {
-                  if (error.status === 409) {
-                      console.log(`Updating variable ${variable.name}...`)
-                      await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
-                          owner: owner,
-                          repo: repository,
-                          environment_name: environment,
-                          name: variable.name,
-                          value: variable.value,
-                          headers: {
-                              'X-GitHub-Api-Version': '2022-11-28'
-                          }
-                      })
-                  }
-              }
-          }))          
+          await createVariables(github, context, environment, variables)        

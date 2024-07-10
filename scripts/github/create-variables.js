@@ -1,27 +1,6 @@
-const variables = [
-    {
-        name: 'GALLERY_NAME',
-        value: '${{ steps.deploy.outputs.galleryName }}'
-    },
-    {
-        name: 'DEV_CENTER_NAME',
-        value: '${{ steps.deploy.outputs.devCenterName }}'
-    },
-    {
-        name: 'IMAGE_BUILDER_MANAGED_IDENTITY_NAME',
-        value: '${{ steps.deploy.outputs.imageBuilderId }}'
-    },
-    {
-        name: 'BASE_DEV_BOX_DEFINITION_NAME',
-        value: '${{ steps.deploy.outputs.devBoxDefinitionName }}'
-    },
-    {
-        name: 'DEV_CENTER_ATTACHED_NETWORK',
-        value: '${{ steps.deploy.outputs.devCenterAttachedNetworkName }}'
-    }
-]
-
-export default ({ github, context, environment, variables }) => {
+// @ts-check
+/** @param {import('@types/github-script').AsyncFunctionArguments} AsyncFunctionArguments */
+export default async function createVariables ({ github, context, environment, variables }) {
     const owner = context.repo.owner
     const repository = context.repo.repo
 
