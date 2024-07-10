@@ -94,5 +94,9 @@ jobs:
                   name: 'DEV_CENTER_ATTACHED_NETWORK',
                   value: '${{ steps.deploy.outputs.devCenterAttachedNetworkName }}'
               },
+              {
+                  name: 'Test',
+                  value: 'Test'
+              }
           ]
           await createVariables({github, context}, environment, variables)        
