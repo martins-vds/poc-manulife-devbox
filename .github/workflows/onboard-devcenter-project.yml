@@ -62,7 +62,7 @@ jobs:
                   exit 1
                 fi
 
-                check-jsonschema --schemafile $projectSchema $projectFile
+                check-jsonschema --schemafile $projectSchema $projectFile > /dev/null
 
                 echo "projectConfigFile=$projectFile" >> "$GITHUB_OUTPUT"
 
