@@ -111,6 +111,7 @@ jobs:
               })
 
               if (response.status === 200) {
+                  console.log(`Updating variable ${variable.name}...`)
                   await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
                       owner: owner,
                       repo: repository,
@@ -122,7 +123,8 @@ jobs:
                       }
                   })
               } else {
-                  github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
+                  console.log(`Creating variable ${variable.name}...`)        
+                  await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
                       owner: owner,
                       repo: repository,
                       environment_name: environment,
