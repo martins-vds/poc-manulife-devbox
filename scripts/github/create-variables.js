@@ -21,8 +21,10 @@ export default async function createVariables({ github, context }, environment, 
     console.log(`Creating variables for environment ${environment}...`);
 
     try {
-        const results = await Promise.allSettled(variables.map(async (variable) => {
+        await Promise.allSettled(variables.map(async (variable) => {
             try {
+                console.log(`Creating variable ${variable.name}...`);
+
                 await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
                     owner: owner,
                     repo: repository,
@@ -34,13 +36,12 @@ export default async function createVariables({ github, context }, environment, 
                     }
                 });
 
-                return {
-                    variable: variable.name
-                };
             } catch (error) {
                 if (error.status !== 409) {
-                    throw error;
+                    throw new Error(`Error creating variable ${variable.name}: ${error}`);
                 }
+
+                console.log(`Variable ${variable.name} already exists, updating...`);
 
                 await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
                     owner: owner,
@@ -52,20 +53,8 @@ export default async function createVariables({ github, context }, environment, 
                         'X-GitHub-Api-Version': '2022-11-28'
                     }
                 });
-
-                return {
-                    variable: variable.name
-                };
             }
         }));
-
-        results.forEach(result => {
-            if (result.status === 'fulfilled') {
-                console.log(`Variable ${result.value.variable} created successfully`);
-            } else {
-                console.log('Variable creation failed', result.reason)
-            }
-        });
     } catch (error) {
         console.log('Error creating variables', error);
     } finally {
