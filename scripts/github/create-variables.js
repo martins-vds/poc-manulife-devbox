@@ -63,7 +63,7 @@ export default async function createVariables({ github, context }, environment, 
 
         results.forEach(result => {
             if (result.status === 'fulfilled') {
-                console.log('Variable created successfully', result.value)
+                console.log('Variable created successfully', JSON.stringify(result.value()));
             } else {
                 console.log('Variable creation failed', result.reason)
             }
