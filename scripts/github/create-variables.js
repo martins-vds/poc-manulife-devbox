@@ -1,6 +1,19 @@
 // @ts-check
-/** @param {import('@types/github-script').AsyncFunctionArguments} AsyncFunctionArguments */
-export default async function createVariables ({ github, context, environment, variables }) {
+
+import * as GitHubTypes from 'github-script'
+
+/**
+ * @typedef {GitHubTypes.AsyncFunctionArguments} AsyncFunctionArguments
+ */
+
+/** 
+ * @param {AsyncFunctionArguments} AsyncFunctionArguments
+ * @param {string} environment
+ * @param {Array<{name: string, value: string}>} variables
+ * 
+*/
+
+export default async function createVariables({ github, context }, environment, variables) {
     const owner = context.repo.owner
     const repository = context.repo.repo
 

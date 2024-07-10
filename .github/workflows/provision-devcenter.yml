@@ -71,7 +71,7 @@ jobs:
         debug: true
         retry-exempt-status-codes: 400,401
         script: |
-          const { default: createVariables } = await import('${{ github.workspace }}/src/create-Variables.js')
+          const { default: createVariables } = await import('${{ github.workspace }}/scripts/github/create-variables.js')
           const environment = '${{ github.event.inputs.env }}'
           const variables = [
               {
@@ -95,4 +95,4 @@ jobs:
                   value: '${{ steps.deploy.outputs.devCenterAttachedNetworkName }}'
               }
           ]
-          await createVariables(github, context, environment, variables)        
+          await createVariables({github, context}, environment, variables)        
