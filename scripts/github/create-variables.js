@@ -23,8 +23,7 @@ export default async function createVariables({ github, context }, environment, 
     try {
         const results = await Promise.allSettled(variables.map(variable => async () => {
             try {
-                console.log(`Creating variable ${variable.name}...`)
-                await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
+                const { data } = await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
                     owner: owner,
                     repo: repository,
                     environment_name: environment,
@@ -33,15 +32,18 @@ export default async function createVariables({ github, context }, environment, 
                     headers: {
                         'X-GitHub-Api-Version': '2022-11-28'
                     }
-                })
+                });
+
+                return {
+                    variable: variable,
+                    data: data
+                };
             } catch (error) {
                 if (error.status !== 409) {
-                    throw error
+                    throw error;
                 }
 
-                console.log(`Updating variable ${variable.name}...`)
-
-                await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
+                const { data } = await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
                     owner: owner,
                     repo: repository,
                     environment_name: environment,
@@ -50,7 +52,12 @@ export default async function createVariables({ github, context }, environment, 
                     headers: {
                         'X-GitHub-Api-Version': '2022-11-28'
                     }
-                })
+                });
+
+                return {
+                    variable: variable,
+                    data: data
+                };
             }
         }));
 
