@@ -99,7 +99,7 @@ jobs:
               }
           ]
 
-          variables.forEach(variable => async () => {
+          Promise.allSettled(variables.map(variable => async () => {
               try {
                   console.log(`Creating variable ${variable.name}...`)
                   await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
@@ -127,4 +127,4 @@ jobs:
                       })
                   }
               }
-          });
+          }))          
