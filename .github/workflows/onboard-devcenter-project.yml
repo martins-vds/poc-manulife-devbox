@@ -42,7 +42,7 @@ jobs:
             - name: Validate Project Configuration
               id: projectConfig
               run: |
-                pip install check-jsonschema
+                pip install check-jsonschema > /dev/null
 
                 projectSchema="./projects/project-schema.json"
 
