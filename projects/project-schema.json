@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "projectName": {
+        "type": "string"
+      },
+      "devBoxDefinitionName": {
+        "type": "string"
+      },
+      "catalogs": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "gitHub": {
+                "type": "object",
+                "properties": {
+                  "uri": {
+                    "type": "string"
+                  },
+                  "branch": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "uri",
+                  "branch",
+                  "path"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "gitHub"
+            ]
+          }
+        ]
+      },
+      "environmentTypes": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "subscriptionId": {
+                "type": "string"
+              },
+              "roles": {
+                "type": "object",
+                "properties": {
+                  "b24988ac-6180-42a0-ab88-20f7382dd24c": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "b24988ac-6180-42a0-ab88-20f7382dd24c"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "subscriptionId",
+              "roles"
+            ]
+          }
+        ]
+      }
+    },
+    "required": [
+      "projectName",
+      "devBoxDefinitionName",
+      "catalogs",
+      "environmentTypes"
+    ]
+  }

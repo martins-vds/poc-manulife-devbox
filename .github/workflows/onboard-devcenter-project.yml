@@ -42,9 +42,14 @@ jobs:
             - name: Validate Project Configuration
               id: projectConfig
               run: |
+                pip install check-jsonschema
+
+                projectSchema="./projects/project-schema.json"
+
                 # Replace spaces with dash and lower case project name
                 projectName=$(echo ${{ github.event.inputs.project-name }} | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
                 projectFolder="./projects/$projectName"
+                projectFile="$projectFolder/project.json"
 
                 # Check if project folder and configuration file exist
                 if [ ! -d $projectFolder ]; then
@@ -52,12 +57,14 @@ jobs:
                   exit 1
                 fi
 
-                if [ ! -f "$projectFolder/project.json" ]; then
+                if [ ! -f $projectFile ]; then
                   echo "Project config file does not exist under '$projectFolder'."
                   exit 1
                 fi
 
-                echo "projectConfigFile=$projectFolder/project.json" >> "$GITHUB_OUTPUT"
+                check-jsonschema --schemafile $projectSchema $projectFile
+
+                echo "projectConfigFile=$projectFile" >> "$GITHUB_OUTPUT"
 
             - name: Deploy Bicep file
               uses: azure/arm-deploy@v2
