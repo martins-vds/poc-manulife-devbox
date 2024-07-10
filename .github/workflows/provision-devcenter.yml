@@ -68,7 +68,6 @@ jobs:
       with:
         github-token: ${{ secrets.MANAGE_ENV_VARS_PAT }}
         retries: 3
-        debug: true
         retry-exempt-status-codes: 400,401
         script: |
           const { default: createVariables } = await import('${{ github.workspace }}/scripts/github/create-variables.js')
