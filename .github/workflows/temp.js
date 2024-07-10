@@ -26,30 +26,8 @@ const variables = [
 ]
 
 variables.forEach(variable => async () => {
-    const response = await github.request(`GET /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
-        owner: owner,
-        repo: repository,
-        environment_name: environment,
-        name: variable.name,
-        headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-        }
-    })
-
-    if (response.status === 200) {
-        console.log(`Updating variable ${variable.name}...`)
-        await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
-            owner: owner,
-            repo: repository,
-            environment_name: environment,
-            name: variable.name,
-            value: variable.value,
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-            }
-        })
-    } else {
-        console.log(`Creating variable ${variable.name}...`)        
+    try {
+        console.log(`Creating variable ${variable.name}...`)
         await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
             owner: owner,
             repo: repository,
@@ -60,5 +38,19 @@ variables.forEach(variable => async () => {
                 'X-GitHub-Api-Version': '2022-11-28'
             }
         })
+    } catch (error) {
+        if (error.status === 409) {
+            console.log(`Updating variable ${variable.name}...`)
+            await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
+                owner: owner,
+                repo: repository,
+                environment_name: environment,
+                name: variable.name,
+                value: variable.value,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            })
+        }
     }
 });
