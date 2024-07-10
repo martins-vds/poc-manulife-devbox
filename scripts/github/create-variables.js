@@ -18,6 +18,8 @@ export default async function createVariables({ github, context }, environment, 
         throw new Error('variables must be an array')
     }
 
+    console.log(`Creating variables for environment ${environment}...`)
+
     Promise.allSettled(variables.map(variable => async () => {
         try {
             console.log(`Creating variable ${variable.name}...`)
