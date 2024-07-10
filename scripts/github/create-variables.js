@@ -21,9 +21,9 @@ export default async function createVariables({ github, context }, environment, 
     console.log(`Creating variables for environment ${environment}...`);
 
     try {
-        const results = await Promise.allSettled(variables.map(variable => async () => {
+        const results = await Promise.allSettled(variables.map(async (variable) => {
             try {
-                const { data } = await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
+                await github.request(`POST /repos/${owner}/${repository}/environments/${environment}/variables`, {
                     owner: owner,
                     repo: repository,
                     environment_name: environment,
@@ -35,15 +35,14 @@ export default async function createVariables({ github, context }, environment, 
                 });
 
                 return {
-                    variable: variable.name,
-                    data: data
+                    variable: variable.name
                 };
             } catch (error) {
                 if (error.status !== 409) {
                     throw error;
                 }
 
-                const { data } = await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
+                await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
                     owner: owner,
                     repo: repository,
                     environment_name: environment,
@@ -55,15 +54,14 @@ export default async function createVariables({ github, context }, environment, 
                 });
 
                 return {
-                    variable: variable.name,
-                    data: data
+                    variable: variable.name
                 };
             }
         }));
 
         results.forEach(result => {
             if (result.status === 'fulfilled') {
-                console.log('Variable created successfully', JSON.stringify(result.value()));
+                console.log(`Variable ${result.value.variable} created successfully`);
             } else {
                 console.log('Variable creation failed', result.reason)
             }
