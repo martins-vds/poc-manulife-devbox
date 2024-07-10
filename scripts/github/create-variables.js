@@ -34,6 +34,8 @@ export default async function createVariables({ github, context }, environment, 
                 }
             })
         } catch (error) {
+            console.log(`Error creating variable ${variable.name}`, error)
+            
             if (error.status === 409) {
                 console.log(`Updating variable ${variable.name}...`)
                 await github.request(`PATCH /repos/${owner}/${repository}/environments/${environment}/variables/${variable.name}`, {
