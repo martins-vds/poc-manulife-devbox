@@ -27,4 +27,8 @@ type devCenterProject = {
   projectName: string
   catalogs: devCenterCatalogArray
   environmentTypes: devCenterEnvironmentTypeArray
+  permissions: {
+    devBoxUsers: string[]
+    devBoxAdmins: string[]
+  }
 }

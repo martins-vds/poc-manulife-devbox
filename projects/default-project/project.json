@@ -19,5 +19,9 @@
                 "b24988ac-6180-42a0-ab88-20f7382dd24c": {}
             }
         }
-    ]
+    ],
+    "permissions":{
+        "devBoxUsers": ["cb6ef5a9-6449-4254-9c14-afe08a011987"],
+        "devBoxAdmins": ["cb6ef5a9-6449-4254-9c14-afe08a011987"]
+    }
 }

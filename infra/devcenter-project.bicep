@@ -6,6 +6,11 @@ param devCenterProjectParams devCenterProject
 param baseDevBoxDefinitionName string
 param location string
 
+var roleDefinitions = {
+  user: '45d50f46-0b78-4001-a660-4198cbe8cd05'
+  admin: '331c37c6-af14-46d9-b9f4-e1909e1b95a0'
+}
+
 resource devCenter 'Microsoft.DevCenter/devcenters@2024-05-01-preview' existing = {
   name: devCenterName
 }
@@ -80,3 +85,23 @@ resource devCenterDefaultProject 'Microsoft.DevCenter/projects@2024-05-01-previe
     }
   }
 }
+
+// assign the devCenterProjectParams.acl to the project
+
+resource devCenterProjectAdminRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for admin in devCenterProjectParams.permissions.devBoxAdmins: {
+  name: guid(devCenterDefaultProject.id, admin, roleDefinitions.admin)
+  scope: devCenterDefaultProject
+  properties: {
+    principalId: admin
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.admin)
+  }
+}]
+
+resource devCenterProjectUserRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for user in devCenterProjectParams.permissions.devBoxUsers: {
+  name: guid(devCenterDefaultProject.id, user, roleDefinitions.user)
+  scope: devCenterDefaultProject
+  properties: {
+    principalId: user
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.user)
+  }
+}]
