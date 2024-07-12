@@ -1,0 +1,40 @@
+name: 
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'projects/**'
+
+jobs:
+    validate:
+        if:  startsWith(github.head_ref, 'projects/')
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4.1.7
+            - name: Validate Project Configuration
+              id: projectConfig
+              run: |
+                pip install check-jsonschema > /dev/null
+
+                branchName=$(echo ${{ github.head_ref }} | cut -d'/' -f2)
+                projectSchema="./projects/project-schema.json"
+
+                # Replace spaces with dash and lower case project name
+                projectName=$(echo $branchName | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+                projectFolder="./projects/$projectName"
+                projectFile="$projectFolder/project.json"
+
+                # Check if project folder and configuration file exist
+                if [ ! -d $projectFolder ]; then
+                  echo "Project folder '$projectFolder' does not exist"
+                  exit 1
+                fi
+
+                if [ ! -f $projectFile ]; then
+                  echo "Project config file does not exist under '$projectFolder'."
+                  exit 1
+                fi
+
+                check-jsonschema --schemafile $projectSchema $projectFile > /dev/null
